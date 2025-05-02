@@ -1,7 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Roles } from '@/infra/auth/roles';
+import { Body, ConflictException, Controller, Post } from '@nestjs/common';
 import { CreateRecipientDto } from './dto/create-recipient.dto';
 import { RecipientService } from './recipient.service';
-import { Roles } from 'src/infra/auth/roles';
 
 @Controller('recipients')
 export class RecipientController {
@@ -10,6 +10,11 @@ export class RecipientController {
   @Post()
   @Roles(['ADMIN'])
   async createRecipient(@Body() createRecipientDto: CreateRecipientDto) {
-    await this.recipientService.createRecipient(createRecipientDto);
+    const result =
+      await this.recipientService.createRecipient(createRecipientDto);
+
+    if (result.isLeft()) {
+      throw new ConflictException(result.value.message);
+    }
   }
 }
