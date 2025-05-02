@@ -1,30 +1,22 @@
-import {
-  ArrayMaxSize,
-  ArrayNotEmpty,
-  IsArray,
-  IsString,
-  IsUUID,
-  MaxLength,
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class CreateOrderDto {
   @IsUUID()
+  @ApiProperty()
   recipientId: string;
 
   @IsUUID()
-  deliverymanId: string;
+  @Transform(({ value }) => (value === null ? undefined : value))
+  @IsOptional()
+  @ApiProperty()
+  deliverymanId?: string;
 
   @IsString()
   @MaxLength(255, {
     message: 'Detalhes devem ter no máximo 255 caracteres',
   })
+  @ApiProperty()
   details: string;
-
-  @IsArray()
-  @ArrayNotEmpty({ message: 'attachmentsIds não pode ser vazio' })
-  @ArrayMaxSize(1, {
-    message: 'deve ser anexada apenas uma foto ao entregar a a encomenda',
-  })
-  @IsUUID()
-  attachmentsIds: string[];
 }
