@@ -22,7 +22,8 @@ export class CreateRecipientDto {
   city: string;
 
   @ApiProperty()
-  @MinLength(3, { message: 'o estado deve ter no mínimo três caracteres' })
+  @IsString()
+  // @MinLength(3, { message: 'o estado deve ter no mínimo três caracteres' })
   state: string;
 
   @ApiProperty()
