@@ -1,3 +1,4 @@
+import { Roles } from '@/infra/auth/roles';
 import {
   BadRequestException,
   Body,
@@ -5,7 +6,8 @@ import {
   Controller,
   Post,
 } from '@nestjs/common';
-import { Roles } from '@/infra/auth/roles';
+import { ApiResponse } from '@nestjs/swagger';
+import { CreateUserResponseDto } from './dto/create-user-response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserAlreadyExistsError } from './errors/user-already-exists-error';
 import { UserService } from './user.service';
@@ -16,6 +18,7 @@ export class UserController {
 
   @Post()
   @Roles(['ADMIN'])
+  @ApiResponse({ status: 201, type: CreateUserResponseDto })
   async createUser(@Body() createUserDto: CreateUserDto) {
     const result = await this.userService.createUser(createUserDto);
     if (result.isLeft()) {
@@ -27,5 +30,11 @@ export class UserController {
           throw new BadRequestException();
       }
     }
+
+    const { accessToken } = result.value;
+
+    return {
+      access_token: accessToken,
+    };
   }
 }
