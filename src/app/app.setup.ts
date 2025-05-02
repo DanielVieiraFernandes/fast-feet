@@ -1,12 +1,12 @@
+import { EnvService } from '@/infra/env/env.service';
 import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { EnvService } from 'src/infra/env/env.service';
 
 const logger = new Logger('Swagger');
 
 export const appSetup = (app: INestApplication) => {
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
 };
 
 export const swaggerSetup = (app: INestApplication, env: EnvService) => {
@@ -20,7 +20,6 @@ export const swaggerSetup = (app: INestApplication, env: EnvService) => {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  
   const port = env.get('PORT');
   logger.log(`Swagger disponível em: http://localhost:${port}/api`);
 };

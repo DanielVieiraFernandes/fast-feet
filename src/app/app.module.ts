@@ -1,13 +1,14 @@
+import { OrderModule } from '@/http/order/order.module';
+import { RecipientModule } from '@/http/recipient/recipient.module';
+import { UserModule } from '@/http/user/user.module';
+import { AuthModule } from '@/infra/auth/auth.module';
+import { PrismaService } from '@/infra/db/prisma.service';
+import { EnvDto } from '@/infra/env/env.dto';
+import { EnvService } from '@/infra/env/env.service';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { RecipientModule } from 'src/http/recipient/recipient.module';
-import { UserModule } from 'src/http/user/user.module';
-import { AuthModule } from 'src/infra/auth/auth.module';
-import { PrismaService } from 'src/infra/db/prisma.service';
-import { EnvDto } from 'src/infra/env/env.dto';
-import { EnvService } from 'src/infra/env/env.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,6 +30,7 @@ import { EnvService } from 'src/infra/env/env.service';
     AuthModule,
     UserModule,
     RecipientModule,
+    OrderModule,
   ],
   providers: [EnvService, PrismaService],
 })
