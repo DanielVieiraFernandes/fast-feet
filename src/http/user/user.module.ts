@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { CryptoModule } from 'src/infra/crypto/crypto.module';
-import { DBModule } from 'src/infra/db/db.module';
+import { CryptoModule } from '@/infra/crypto/crypto.module';
+import { DBModule } from '@/infra/db/db.module';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 

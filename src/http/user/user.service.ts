@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Either, left, right } from 'src/app/errors/either';
-import { UserPayload } from 'src/infra/auth/jwt.strategy';
-import { Hash } from 'src/infra/crypto/hash';
-import { PrismaService } from 'src/infra/db/prisma.service';
+import { UserPayload } from '@/infra/auth/jwt.strategy';
+import { Hash } from '@/infra/crypto/hash';
+import { PrismaService } from '@/infra/db/prisma.service';
+import { Either, left, right } from '@/shared/either';
 import { type CreateUserDto } from './dto/create-user.dto';
 import { UserAlreadyExistsError } from './errors/user-already-exists-error';
 

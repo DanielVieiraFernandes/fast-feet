@@ -5,7 +5,7 @@ import {
   Controller,
   Post,
 } from '@nestjs/common';
-import { Roles } from 'src/infra/auth/roles';
+import { Roles } from '@/infra/auth/roles';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserAlreadyExistsError } from './errors/user-already-exists-error';
 import { UserService } from './user.service';
