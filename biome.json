@@ -1,0 +1,40 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "organizeImports": {
+        "enabled": true
+    },
+    "formatter": {
+        "indentStyle": "space",
+        "indentWidth": 2,
+        "lineWidth": 80
+    },
+    "javascript": {
+        "formatter": {
+            "arrowParentheses": "asNeeded",
+            "jsxQuoteStyle": "double",
+            "quoteStyle": "single",
+            "semicolons": "always",
+            "trailingCommas": "es5"
+        },
+        "parser": {
+            "unsafeParameterDecoratorsEnabled": true
+        }
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": false,
+            "correctness": {
+                "noUnusedImports": {
+                    "fix": "safe",
+                    "level": "warn"
+                }
+            }
+        }
+    },
+    "files": {
+        "ignore": [
+            "node_modules"
+        ]
+    }
+}

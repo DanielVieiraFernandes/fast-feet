@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  DELIVERYMAN
+  ADMIN
+}
+
+model User {
+  id       String   @id @default(uuid())
+  cpf      String   @unique
+  password String
+  role     UserRole
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  orders    Order[]
+
+  @@map("users")
+}
+
+model Recipient {
+  id      String @id @default(uuid())
+  name    String
+  email   String @unique
+  address String
+  city    String
+  state   String
+  zipcode String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  Order     Order[]
+}
+
+model Order {
+  id            String  @id @default(uuid())
+  details       String
+  recipientId   String
+  deliverymanId String?
+
+  pickedUpAt  DateTime?
+  deliveredAt DateTime?
+  returnedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime?
+
+  deliveryman User?        @relation(fields: [deliverymanId], references: [id])
+  recipient   Recipient    @relation(fields: [recipientId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  attachments Attachment[]
+
+  @@map("orders")
+}
+
+model Attachment {
+  id    String @id @default(uuid())
+  title String
+  url   String
+
+  orderId String?
+
+  order Order? @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
+}
