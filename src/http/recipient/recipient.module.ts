@@ -1,5 +1,5 @@
+import { DBModule } from '@/infra/db/db.module';
 import { Module } from '@nestjs/common';
-import { DBModule } from 'src/infra/db/db.module';
 import { RecipientController } from './recipient.controller';
 import { RecipientService } from './recipient.service';
 
