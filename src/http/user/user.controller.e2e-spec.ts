@@ -1,8 +1,8 @@
+import { PrismaService } from '@/infra/db/prisma.service';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
-import { AppModule } from 'src/app/app.module';
-import { PrismaService } from 'src/infra/db/prisma.service';
+import { AppModule } from '@/app/app.module';
 import request from 'supertest';
 
 describe('Create user', () => {
