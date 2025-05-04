@@ -3,12 +3,16 @@ import { PrismaService } from '@/infra/db/prisma.service';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
+import { Recipient, User } from '@prisma/client';
 import request from 'supertest';
 
 describe('Create recipient', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let jwt: JwtService;
+  let user: User;
+  let recipient: Recipient;
+  let accessToken: string;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -21,11 +25,8 @@ describe('Create recipient', () => {
     jwt = moduleRef.get(JwtService);
     app.setGlobalPrefix('api');
     app.useGlobalPipes(new ValidationPipe());
-    await app.init();
-  });
 
-  test('[POST] /api/orders', async () => {
-    const user = await prisma.user.create({
+    user = await prisma.user.create({
       data: {
         cpf: '888.888.888-88',
         password: '123456',
@@ -33,22 +34,25 @@ describe('Create recipient', () => {
       },
     });
 
-    const accessToken = jwt.sign({
+    accessToken = jwt.sign({
       sub: user.id,
       role: user.role,
     });
 
-    const recipient = await prisma.recipient.create({
+    recipient = await prisma.recipient.create({
       data: {
         name: 'Recipient',
         address: '',
         city: '',
-        email: '',
+        email: 'recipient@gmail.com',
         state: '',
         zipcode: '',
       },
     });
+    await app.init();
+  });
 
+  test('[POST] /api/orders', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/orders')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -68,6 +72,62 @@ describe('Create recipient', () => {
       },
     });
 
+    console.log(ordersOnDatabase)
+
     expect(ordersOnDatabase).toBeTruthy();
+  });
+
+  test('[PUT] /api/orders/:id', async () => {
+    const order = await prisma.order.create({
+      data: {
+        recipientId: recipient.id,
+        details: 'new details',
+      },
+    });
+
+    const response = await request(app.getHttpServer())
+      .put(`/api/orders/${order.id}`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        details: 'big order',
+      });
+
+    // console.log(response.error);
+
+    expect(response.statusCode).toEqual(200);
+
+    const ordersOnDatabase = await prisma.order.findFirst({
+      where: {
+        details: 'big order',
+      },
+    });
+
+    expect(ordersOnDatabase).toBeTruthy();
+  });
+
+  test('[PUT] /api/orders/:id', async () => {
+    const order = await prisma.order.create({
+      data: {
+        recipientId: recipient.id,
+        details: 'new details',
+      },
+    });
+
+
+    const response = await request(app.getHttpServer())
+      .delete(`/api/orders/${order.id}`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    // console.log(response.error);
+
+    expect(response.statusCode).toEqual(200);
+
+    const ordersOnDatabase = await prisma.order.findFirst({
+      where: {
+        id: order.id,
+      },
+    });
+
+    expect(ordersOnDatabase).toBeNull();
   });
 });

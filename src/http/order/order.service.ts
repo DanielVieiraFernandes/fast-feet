@@ -1,5 +1,7 @@
 import { PrismaService } from '@/infra/db/prisma.service';
 import { Either, left, right } from '@/shared/either';
+import { PaginatedOrdersDto } from '@/utils/dto/paginated-orders.dto';
+import { Paginated } from '@/utils/dto/pagination.dto';
 import { Injectable } from '@nestjs/common';
 import { Order } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -10,6 +12,36 @@ import { OrderAlreadyExistsOnDatabase } from './errors/order-already-exists-on-d
 @Injectable()
 export class OrderService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findAll(dto: PaginatedOrdersDto): Promise<
+    Either<
+      null,
+      {
+        orders: Order[];
+      }
+    >
+  > {
+    const paginated = new Paginated<PaginatedOrdersDto>(dto);
+
+    const orders = await this.prisma.order.findMany({
+      where: {
+        ...(paginated.pickedUpAt && {
+          pickedUpAt: {
+            not: null,
+          },
+        }),
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: paginated.take,
+      skip: paginated.skip,
+    });
+
+    return right({
+      orders,
+    });
+  }
 
   async createOrder({
     recipientId,
@@ -79,6 +111,22 @@ export class OrderService {
 
       await this.updateAttachmentsRelations(attachmentsIds, orderId);
     }
+
+    return right({});
+  }
+
+  async deleteOrder(id: string): Promise<Either<Error, {}>> {
+    const order = await this.orderOnDatabase(id);
+
+    if (!order) {
+      return left(new Error('Order does not exist'));
+    }
+
+    await this.prisma.order.delete({
+      where: {
+        id: order.id,
+      },
+    });
 
     return right({});
   }
