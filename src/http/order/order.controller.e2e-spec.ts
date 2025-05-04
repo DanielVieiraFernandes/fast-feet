@@ -24,7 +24,7 @@ describe('Create recipient', () => {
     await app.init();
   });
 
-  test('[POST] /api/recipients', async () => {
+  test('[POST] /api/orders', async () => {
     const user = await prisma.user.create({
       data: {
         cpf: '888.888.888-88',
@@ -38,30 +38,36 @@ describe('Create recipient', () => {
       role: user.role,
     });
 
+    const recipient = await prisma.recipient.create({
+      data: {
+        name: 'Recipient',
+        address: '',
+        city: '',
+        email: '',
+        state: '',
+        zipcode: '',
+      },
+    });
+
     const response = await request(app.getHttpServer())
-      .post('/api/recipients')
+      .post('/api/orders')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        name: 'Daniel',
-        email: 'daniel@gmail.com',
-        address: 'Rua Jerônimo da Silva',
-        city: 'Hortolândia',
-        state: 'SP',
-        zipcode: '00000-000',
+        recipientId: recipient.id,
+        details: 'New Details',
       });
 
     // console.log(response.error);
 
     expect(response.statusCode).toEqual(201);
 
-    const recipientOnDatabase = await prisma.recipient.findFirst({
+    const ordersOnDatabase = await prisma.order.findFirst({
       where: {
-        email: 'daniel@gmail.com',
+        recipientId: recipient.id,
+        details: 'New Details',
       },
     });
 
-    // console.log(recipientOnDatabase);
-
-    expect(recipientOnDatabase).toBeTruthy();
+    expect(ordersOnDatabase).toBeTruthy();
   });
 });

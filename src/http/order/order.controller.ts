@@ -1,3 +1,4 @@
+import { Roles } from '@/infra/auth/roles';
 import {
   BadRequestException,
   Body,
@@ -15,8 +16,9 @@ import { OrderService } from './order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Post()
   @ApiResponse({ status: 201, type: OrderResponseDto })
+  @Post()
+  @Roles(['ADMIN'])
   async createOrder(@Body() createOrderDto: CreateOrderDto) {
     const result = await this.orderService.createOrder(createOrderDto);
 
