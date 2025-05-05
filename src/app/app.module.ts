@@ -1,3 +1,4 @@
+import { AttachmentModule } from '@/http/attachment/attachment.module';
 import { OrderModule } from '@/http/order/order.module';
 import { RecipientModule } from '@/http/recipient/recipient.module';
 import { UserModule } from '@/http/user/user.module';
@@ -31,6 +32,7 @@ import { validateSync } from 'class-validator';
     UserModule,
     RecipientModule,
     OrderModule,
+    AttachmentModule,
   ],
   providers: [EnvService, PrismaService],
 })
