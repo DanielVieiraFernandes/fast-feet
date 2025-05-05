@@ -43,6 +43,25 @@ export class OrderService {
     });
   }
 
+  async find(id: string): Promise<
+    Either<
+      OrderAlreadyExistsOnDatabase,
+      {
+        order: Order;
+      }
+    >
+  > {
+    const order = await this.orderOnDatabase(id);
+
+    if (!order) {
+      return left(new OrderAlreadyExistsOnDatabase());
+    }
+
+    return right({
+      order,
+    });
+  }
+
   async createOrder({
     recipientId,
     deliverymanId,

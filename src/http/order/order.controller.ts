@@ -27,6 +27,26 @@ export class OrderController {
 
   @ApiResponse({
     status: 200,
+    type: OrderResponseDto,
+  })
+  @Get('/:id')
+  @Roles(['ADMIN', 'DELIVERYMAN'])
+  async find(@Param('id') id: string) {
+    const result = await this.orderService.find(id);
+
+    if (result.isLeft()) {
+      throw new BadRequestException(result.value.message);
+    }
+
+    const { order } = result.value;
+
+    return {
+      order,
+    };
+  }
+
+  @ApiResponse({
+    status: 200,
     example: {
       content: {
         orders: '[]',
