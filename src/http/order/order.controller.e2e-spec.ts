@@ -105,7 +105,7 @@ describe('Create recipient', () => {
     expect(ordersOnDatabase).toBeTruthy();
   });
 
-  test('[PUT] /api/orders/:id', async () => {
+  test('[DELETE] /api/orders/:id', async () => {
     const order = await prisma.order.create({
       data: {
         recipientId: recipient.id,
@@ -129,5 +129,32 @@ describe('Create recipient', () => {
     });
 
     expect(ordersOnDatabase).toBeNull();
+  });
+
+
+  test('[GET] /api/orders/:id', async () => {
+    const order = await prisma.order.create({
+      data: {
+        recipientId: recipient.id,
+        details: 'new details',
+      },
+    });
+
+
+    const response = await request(app.getHttpServer())
+      .get(`/api/orders/${order.id}`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    // console.log(response.error);
+
+    expect(response.statusCode).toEqual(200);
+
+    const ordersOnDatabase = await prisma.order.findFirst({
+      where: {
+        id: order.id,
+      },
+    });
+
+    expect(ordersOnDatabase).toBeTruthy();
   });
 });
