@@ -1,3 +1,4 @@
+import { Roles } from '@/infra/auth/roles';
 import {
   BadRequestException,
   Controller,
@@ -17,6 +18,7 @@ export class AttachmentController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
+  @Roles(['ADMIN', 'DELIVERYMAN'])
   async upload(
     @UploadedFile(
       new ParseFilePipe({

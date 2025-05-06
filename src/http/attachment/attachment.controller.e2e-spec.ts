@@ -3,7 +3,7 @@ import { PrismaService } from '@/infra/db/prisma.service';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
-import { Recipient, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import request from 'supertest';
 
 describe('Controller attachment (E2E)', () => {
@@ -11,7 +11,6 @@ describe('Controller attachment (E2E)', () => {
   let prisma: PrismaService;
   let jwt: JwtService;
   let user: User;
-  let recipient: Recipient;
   let accessToken: string;
 
   beforeAll(async () => {
@@ -39,122 +38,32 @@ describe('Controller attachment (E2E)', () => {
       role: user.role,
     });
 
-    recipient = await prisma.recipient.create({
-      data: {
-        name: 'Recipient',
-        address: '',
-        city: '',
-        email: 'recipient@gmail.com',
-        state: '',
-        zipcode: '',
-      },
-    });
     await app.init();
   });
 
-  test('[POST] /api/orders', async () => {
+  test('[POST] /api/attachments', async () => {
     const response = await request(app.getHttpServer())
-      .post('/api/orders')
+      .post('/api/attachment')
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        recipientId: recipient.id,
-        details: 'New Details',
-      });
+      .attach('file', './test/e2e/sample-upload.png');
 
-    // console.log(response.error);
+    console.log(response.error);
 
     expect(response.statusCode).toEqual(201);
+    expect(response.body).toEqual({
+      attachmentId: expect.any(String),
+    });
 
-    const ordersOnDatabase = await prisma.order.findFirst({
+    const attachmentId = response.body.attachmentId;
+
+    const attachmentOnDatabase = await prisma.attachment.findFirst({
       where: {
-        recipientId: recipient.id,
-        details: 'New Details',
+        id: attachmentId,
       },
     });
 
-    console.log(ordersOnDatabase)
+    // console.log(attachmentOnDatabase)
 
-    expect(ordersOnDatabase).toBeTruthy();
-  });
-
-  test('[PUT] /api/orders/:id', async () => {
-    const order = await prisma.order.create({
-      data: {
-        recipientId: recipient.id,
-        details: 'new details',
-      },
-    });
-
-    const response = await request(app.getHttpServer())
-      .put(`/api/orders/${order.id}`)
-      .set('Authorization', `Bearer ${accessToken}`)
-      .send({
-        details: 'big order',
-      });
-
-    // console.log(response.error);
-
-    expect(response.statusCode).toEqual(200);
-
-    const ordersOnDatabase = await prisma.order.findFirst({
-      where: {
-        details: 'big order',
-      },
-    });
-
-    expect(ordersOnDatabase).toBeTruthy();
-  });
-
-  test('[DELETE] /api/orders/:id', async () => {
-    const order = await prisma.order.create({
-      data: {
-        recipientId: recipient.id,
-        details: 'new details',
-      },
-    });
-
-
-    const response = await request(app.getHttpServer())
-      .delete(`/api/orders/${order.id}`)
-      .set('Authorization', `Bearer ${accessToken}`);
-
-    // console.log(response.error);
-
-    expect(response.statusCode).toEqual(200);
-
-    const ordersOnDatabase = await prisma.order.findFirst({
-      where: {
-        id: order.id,
-      },
-    });
-
-    expect(ordersOnDatabase).toBeNull();
-  });
-
-
-  test('[GET] /api/orders/:id', async () => {
-    const order = await prisma.order.create({
-      data: {
-        recipientId: recipient.id,
-        details: 'new details',
-      },
-    });
-
-
-    const response = await request(app.getHttpServer())
-      .get(`/api/orders/${order.id}`)
-      .set('Authorization', `Bearer ${accessToken}`);
-
-    // console.log(response.error);
-
-    expect(response.statusCode).toEqual(200);
-
-    const ordersOnDatabase = await prisma.order.findFirst({
-      where: {
-        id: order.id,
-      },
-    });
-
-    expect(ordersOnDatabase).toBeTruthy();
+    expect(attachmentOnDatabase).toBeTruthy();
   });
 });
