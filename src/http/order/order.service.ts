@@ -107,6 +107,7 @@ export class OrderService {
       data: {
         ...(dto.deliverymanId && { deliverymanId: dto.deliverymanId }),
         ...dto,
+        
       },
     });
 

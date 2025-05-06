@@ -38,15 +38,15 @@ model User {
 }
 
 model Recipient {
-  id        String  @id @default(uuid())
+  id        String @id @default(uuid())
   name      String
-  email     String  @unique
+  email     String @unique
   address   String
   city      String
   state     String
   zipcode   String
-  latitude  Decimal
-  longitude Decimal
+  latitude  Float
+  longitude Float
 
   createdAt DateTime  @default(now())
   updatedAt DateTime?
@@ -62,8 +62,8 @@ model Order {
   city          String
   state         String
   zipcode       String
-  latitude      Decimal
-  longitude     Decimal
+  latitude      Float
+  longitude     Float
 
   pickedUpAt  DateTime?
   deliveredAt DateTime?

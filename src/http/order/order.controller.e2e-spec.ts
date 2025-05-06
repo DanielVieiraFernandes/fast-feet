@@ -60,16 +60,22 @@ describe('Create recipient', () => {
     await app.init();
   });
 
-  test.skip('[POST] /api/orders', async () => {
+  test('[POST] /api/orders', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/orders')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         recipientId: recipient.id,
         details: 'New Details',
+        address: 'Rua Jerônimo da Silva',
+        city: 'Hortolândia',
+        state: 'SP',
+        zipcode: '00000-000',
+        latitude: 35.689487,
+        longitude: 139.691711,
       });
 
-    // console.log(response.error);
+    console.log(response.error);
 
     expect(response.statusCode).toEqual(201);
 
@@ -85,11 +91,17 @@ describe('Create recipient', () => {
     expect(ordersOnDatabase).toBeTruthy();
   });
 
-  test.skip('[PUT] /api/orders/:id', async () => {
+  test('[PUT] /api/orders/:id', async () => {
     const order = await prisma.order.create({
       data: {
         recipientId: recipient.id,
         details: 'new details',
+        latitude: -22.876945,
+        longitude: -47.250198,
+        state: '',
+        zipcode: '',
+        address: '',
+        city: '',
       },
     });
 
@@ -128,11 +140,17 @@ describe('Create recipient', () => {
     expect(attachmentOnDatabase?.orderId).toEqual(ordersOnDatabase?.id);
   });
 
-  test.skip('[DELETE] /api/orders/:id', async () => {
+  test('[DELETE] /api/orders/:id', async () => {
     const order = await prisma.order.create({
       data: {
         recipientId: recipient.id,
         details: 'new details',
+        latitude: -22.876945,
+        longitude: -47.250198,
+        state: '',
+        zipcode: '',
+        address: '',
+        city: '',
       },
     });
 
@@ -158,6 +176,12 @@ describe('Create recipient', () => {
       data: {
         recipientId: recipient.id,
         details: 'new details',
+        latitude: -22.876945,
+        longitude: -47.250198,
+        state: '',
+        zipcode: '',
+        address: '',
+        city: '',
       },
     });
 
@@ -178,7 +202,7 @@ describe('Create recipient', () => {
     expect(ordersOnDatabase).toBeTruthy();
   });
 
-  test.only('[GET] retornar nada /api/orders', async () => {
+  test('[GET] retornar nada /api/orders', async () => {
     await prisma.order.create({
       data: {
         recipientId: recipient.id,
@@ -196,10 +220,10 @@ describe('Create recipient', () => {
       .get(`/api/orders`)
       .set('Authorization', `Bearer ${accessToken}`);
 
-    console.log(response.error);
+    // console.log(response.error);
 
     expect(response.statusCode).toEqual(200);
-    console.log(response.body)
+    
     
   });
 });

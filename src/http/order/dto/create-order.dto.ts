@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
-  IsDecimal,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -47,9 +47,9 @@ export class CreateOrderDto {
   @Matches(/^\d{5}-\d{3}$/, { message: 'O CEP deve ter o formato XXXXX-XXX' })
   zipcode: string;
 
-  @IsDecimal()
+  @IsNumber()
   latitude: number;
 
-  @IsDecimal()
+  @IsNumber()
   longitude: number;
 }
