@@ -72,7 +72,7 @@ describe('Create recipient', () => {
       },
     });
 
-    console.log(ordersOnDatabase)
+    console.log(ordersOnDatabase);
 
     expect(ordersOnDatabase).toBeTruthy();
   });
@@ -85,14 +85,22 @@ describe('Create recipient', () => {
       },
     });
 
+    const attachment = await prisma.attachment.create({
+      data: {
+        title: 'Attachment title',
+        url: 'url.com',
+      },
+    });
+
     const response = await request(app.getHttpServer())
       .put(`/api/orders/${order.id}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         details: 'big order',
+        attachmentsIds: [attachment.id],
       });
 
-    // console.log(response.error);
+    console.log(response.error);
 
     expect(response.statusCode).toEqual(200);
 
@@ -102,7 +110,14 @@ describe('Create recipient', () => {
       },
     });
 
+    const attachmentOnDatabase = await prisma.attachment.findUnique({
+      where: {
+        id: attachment.id,
+      },
+    });
+
     expect(ordersOnDatabase).toBeTruthy();
+    expect(attachmentOnDatabase?.orderId).toEqual(ordersOnDatabase?.id);
   });
 
   test('[DELETE] /api/orders/:id', async () => {
@@ -112,7 +127,6 @@ describe('Create recipient', () => {
         details: 'new details',
       },
     });
-
 
     const response = await request(app.getHttpServer())
       .delete(`/api/orders/${order.id}`)
@@ -131,7 +145,6 @@ describe('Create recipient', () => {
     expect(ordersOnDatabase).toBeNull();
   });
 
-
   test('[GET] /api/orders/:id', async () => {
     const order = await prisma.order.create({
       data: {
@@ -139,7 +152,6 @@ describe('Create recipient', () => {
         details: 'new details',
       },
     });
-
 
     const response = await request(app.getHttpServer())
       .get(`/api/orders/${order.id}`)
