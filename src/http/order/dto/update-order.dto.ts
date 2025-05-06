@@ -30,7 +30,6 @@ export class UpdateOrderDto {
   @ArrayMaxSize(1, {
     message: 'deve ser anexada apenas uma foto ao entregar a a encomenda',
   })
-  @IsUUID()
   @Transform(({ value }) => (value === null ? undefined : value))
   @IsOptional()
   attachmentsIds?: string[];
