@@ -31,6 +31,7 @@ describe('Create recipient', () => {
         cpf: '888.888.888-88',
         password: '123456',
         role: 'ADMIN',
+        
       },
     });
 

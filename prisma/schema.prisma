@@ -23,6 +23,10 @@ model User {
   cpf      String   @unique
   password String
   role     UserRole
+  address  String
+  city     String
+  state    String
+  zipcode  String
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
