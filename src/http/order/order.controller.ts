@@ -1,3 +1,5 @@
+import { CurrentUser } from '@/infra/auth/current-user';
+import { UserPayload } from '@/infra/auth/jwt.strategy';
 import { Roles } from '@/infra/auth/roles';
 import { PaginationOrder } from '@/utils/decorators/pagination-orders.decorator';
 import { ApiPaginatedOrders } from '@/utils/docs/pagination-orders.docs';
@@ -56,12 +58,20 @@ export class OrderController {
   @ApiPaginatedOrders()
   @Get()
   @Roles(['ADMIN', 'DELIVERYMAN'])
-  async findAll(@PaginationOrder() paginatedOrdersDto: PaginatedOrdersDto) {
-    const result = await this.orderService.findAll(paginatedOrdersDto);
+  async findAll(
+    @PaginationOrder() paginatedOrdersDto: PaginatedOrdersDto,
+    @CurrentUser() user: UserPayload
+  ) {
+    const result = await this.orderService.findAll(
+      paginatedOrdersDto,
+      user.sub
+    );
 
     if (result.isLeft()) {
       throw new BadRequestException();
     }
+
+    console.log(result.value)
 
     const { orders } = result.value;
 

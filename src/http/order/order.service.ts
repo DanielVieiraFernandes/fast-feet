@@ -12,8 +12,10 @@ import { OrderAlreadyExistsOnDatabase } from './errors/order-already-exists-on-d
 @Injectable()
 export class OrderService {
   constructor(private readonly prisma: PrismaService) {}
-
-  async findAll(dto: PaginatedOrdersDto): Promise<
+  async findAll(
+    dto: PaginatedOrdersDto,
+    userId: string
+  ): Promise<
     Either<
       null,
       {
@@ -23,20 +25,37 @@ export class OrderService {
   > {
     const paginated = new Paginated<PaginatedOrdersDto>(dto);
 
-    const orders = await this.prisma.order.findMany({
-      where: {
-        ...(paginated.pickedUpAt && {
-          pickedUpAt: {
-            not: null,
-          },
-        }),
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: paginated.take,
-      skip: paginated.skip,
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
     });
+
+    if (!user) {
+      throw new Error('User does not exist');
+    }
+
+    const { latitude, longitude } = user;
+
+    const maxDistanceKm = 50;
+
+    const orders = (await this.prisma.$queryRawUnsafe(`
+      SELECT * FROM (
+        SELECT
+          o.*,
+          (
+            6371 * acos(
+              cos(radians(${latitude}))
+              * cos(radians(o.latitude))
+              * cos(radians(o.longitude) - radians(${longitude}))
+              + sin(radians(${latitude})) * sin(radians(o.latitude))
+            )
+          ) AS distance_km
+        FROM orders o
+      ) AS subquery
+      WHERE distance_km <= ${maxDistanceKm}
+      ORDER BY distance_km ASC
+      LIMIT ${paginated.take}
+      OFFSET ${paginated.skip};
+    `)) as Order[];
 
     return right({
       orders,
@@ -62,11 +81,7 @@ export class OrderService {
     });
   }
 
-  async createOrder({
-    recipientId,
-    deliverymanId,
-    details,
-  }: CreateOrderDto): Promise<
+  async createOrder(dto: CreateOrderDto): Promise<
     Either<
       EntityNotExistsError,
       {
@@ -74,14 +89,14 @@ export class OrderService {
       }
     >
   > {
-    const recipient = await this.recipientOnDatabase(recipientId);
+    const recipient = await this.recipientOnDatabase(dto.recipientId);
 
     if (!recipient) {
       return left(new EntityNotExistsError('recipient'));
     }
 
-    if (deliverymanId) {
-      const deliveryman = this.deliverymanOnDatabase(deliverymanId);
+    if (dto.deliverymanId) {
+      const deliveryman = this.deliverymanOnDatabase(dto.deliverymanId);
 
       if (!deliveryman) {
         return left(new EntityNotExistsError('deliveryman'));
@@ -90,9 +105,8 @@ export class OrderService {
 
     const order = await this.prisma.order.create({
       data: {
-        details,
-        recipientId,
-        ...(deliverymanId && { deliverymanId }),
+        ...(dto.deliverymanId && { deliverymanId: dto.deliverymanId }),
+        ...dto,
       },
     });
 

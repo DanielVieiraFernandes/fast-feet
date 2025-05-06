@@ -66,7 +66,17 @@ export class UserService {
     });
   }
 
-  async createUser({ cpf, role, password }: CreateUserDto): Promise<
+  async createUser({
+    cpf,
+    role,
+    password,
+    address,
+    city,
+    latitude,
+    longitude,
+    state,
+    zipcode,
+  }: CreateUserDto): Promise<
     Either<
       UserAlreadyExistsError,
       {
@@ -84,7 +94,17 @@ export class UserService {
       return left(new UserAlreadyExistsError());
     }
 
-    const user = await this.createUserInDatabase({ cpf, password, role });
+    const user = await this.createUserInDatabase({
+      cpf,
+      password,
+      role,
+      address,
+      city,
+      latitude,
+      longitude,
+      state,
+      zipcode,
+    });
 
     const accessToken = await this.generateAccessToken({
       sub: user.id,

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString, Length, Matches } from 'class-validator';
+import { IsDecimal, IsEnum, IsString, Length, Matches, MinLength } from 'class-validator';
 
 enum UserRole {
   DELIVERYMAN = 'DELIVERYMAN',
@@ -26,4 +26,30 @@ export class CreateUserDto {
     message: 'incorrect',
   })
   role: UserRole;
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(5, { message: 'o endereço deve ter no mínimo 5 caracteres' })
+  address: string;
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(3, { message: 'a cidade deve ter no mínimo três caracteres' })
+  city: string;
+
+  @ApiProperty()
+  @IsString()
+  // @MinLength(3, { message: 'o estado deve ter no mínimo três caracteres' })
+  state: string;
+
+  @ApiProperty()
+  @IsString()
+  @Matches(/^\d{5}-\d{3}$/, { message: 'O CEP deve ter o formato XXXXX-XXX' })
+  zipcode: string;
+
+  @IsDecimal()
+  latitude: number;
+
+  @IsDecimal()
+  longitude: number;
 }

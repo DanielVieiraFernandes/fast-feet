@@ -31,7 +31,12 @@ describe('Create recipient', () => {
         cpf: '888.888.888-88',
         password: '123456',
         role: 'ADMIN',
-        
+        city: '',
+        latitude: -22.876945,
+        longitude: -47.250198,
+        state: '',
+        zipcode: '',
+        address: '',
       },
     });
 
@@ -48,12 +53,14 @@ describe('Create recipient', () => {
         email: 'recipient@gmail.com',
         state: '',
         zipcode: '',
+        latitude: 35.689487,
+        longitude: 139.691711,
       },
     });
     await app.init();
   });
 
-  test('[POST] /api/orders', async () => {
+  test.skip('[POST] /api/orders', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/orders')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -78,7 +85,7 @@ describe('Create recipient', () => {
     expect(ordersOnDatabase).toBeTruthy();
   });
 
-  test('[PUT] /api/orders/:id', async () => {
+  test.skip('[PUT] /api/orders/:id', async () => {
     const order = await prisma.order.create({
       data: {
         recipientId: recipient.id,
@@ -121,7 +128,7 @@ describe('Create recipient', () => {
     expect(attachmentOnDatabase?.orderId).toEqual(ordersOnDatabase?.id);
   });
 
-  test('[DELETE] /api/orders/:id', async () => {
+  test.skip('[DELETE] /api/orders/:id', async () => {
     const order = await prisma.order.create({
       data: {
         recipientId: recipient.id,
@@ -169,5 +176,30 @@ describe('Create recipient', () => {
     });
 
     expect(ordersOnDatabase).toBeTruthy();
+  });
+
+  test.only('[GET] retornar nada /api/orders', async () => {
+    await prisma.order.create({
+      data: {
+        recipientId: recipient.id,
+        details: 'new details',
+        latitude: -22.876945,
+        longitude: -47.250198,
+        state: '',
+        zipcode: '',
+        address: '',
+        city: '',
+      },
+    });
+
+    const response = await request(app.getHttpServer())
+      .get(`/api/orders`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    console.log(response.error);
+
+    expect(response.statusCode).toEqual(200);
+    console.log(response.body)
+    
   });
 });

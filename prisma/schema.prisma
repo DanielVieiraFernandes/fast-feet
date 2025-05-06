@@ -19,14 +19,16 @@ enum UserRole {
 }
 
 model User {
-  id       String   @id @default(uuid())
-  cpf      String   @unique
-  password String
-  role     UserRole
-  address  String
-  city     String
-  state    String
-  zipcode  String
+  id        String   @id @default(uuid())
+  cpf       String   @unique
+  password  String
+  role      UserRole
+  address   String
+  city      String
+  state     String
+  zipcode   String
+  latitude  Decimal
+  longitude Decimal
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -36,13 +38,15 @@ model User {
 }
 
 model Recipient {
-  id      String @id @default(uuid())
-  name    String
-  email   String @unique
-  address String
-  city    String
-  state   String
-  zipcode String
+  id        String  @id @default(uuid())
+  name      String
+  email     String  @unique
+  address   String
+  city      String
+  state     String
+  zipcode   String
+  latitude  Decimal
+  longitude Decimal
 
   createdAt DateTime  @default(now())
   updatedAt DateTime?
@@ -54,6 +58,12 @@ model Order {
   details       String
   recipientId   String
   deliverymanId String?
+  address       String
+  city          String
+  state         String
+  zipcode       String
+  latitude      Decimal
+  longitude     Decimal
 
   pickedUpAt  DateTime?
   deliveredAt DateTime?

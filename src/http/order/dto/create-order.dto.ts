@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import {
+  IsDecimal,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreateOrderDto {
   @IsUUID()
@@ -19,4 +27,29 @@ export class CreateOrderDto {
   })
   @ApiProperty()
   details: string;
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(5, { message: 'o endereço deve ter no mínimo 5 caracteres' })
+  address: string;
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(3, { message: 'a cidade deve ter no mínimo três caracteres' })
+  city: string;
+
+  @ApiProperty()
+  @IsString()
+  state: string;
+
+  @ApiProperty()
+  @IsString()
+  @Matches(/^\d{5}-\d{3}$/, { message: 'O CEP deve ter o formato XXXXX-XXX' })
+  zipcode: string;
+
+  @IsDecimal()
+  latitude: number;
+
+  @IsDecimal()
+  longitude: number;
 }

@@ -5,8 +5,8 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Roles } from './roles';
 import { UserPayload } from './jwt.strategy';
+import { Roles } from './roles';
 
 @Injectable()
 export class RolesGuard implements CanActivate {

@@ -1,6 +1,6 @@
 import { PrismaService } from '@/infra/db/prisma.service';
-import { Injectable } from '@nestjs/common';
 import { Either, left, right } from '@/shared/either';
+import { Injectable } from '@nestjs/common';
 import { CreateRecipientDto } from './dto/create-recipient.dto';
 import { RecipientAlreadyExistsError } from './errors/recipient-already-exists-error';
 
