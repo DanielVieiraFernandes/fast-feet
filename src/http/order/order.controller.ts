@@ -7,11 +7,14 @@ import { PaginatedOrdersDto } from '@/utils/dto/paginated-orders.dto';
 import {
   BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Put,
 } from '@nestjs/common';
@@ -21,6 +24,7 @@ import { OrderResponseDto } from './dto/order-response.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { EntityNotExistsError } from './errors/entity-not-exists-error';
 import { OrderAlreadyExistsOnDatabase } from './errors/order-already-exists-on-database-error';
+import { TheOrderHasAlreadyBeenWithdrawError } from './errors/the-order-has-already-been-withdrawn-error';
 import { OrderService } from './order.service';
 
 @Controller('orders')
@@ -136,5 +140,30 @@ export class OrderController {
     if (result.isLeft()) {
       throw new BadRequestException();
     }
+  }
+
+  @ApiResponse({ status: 204 })
+  @Patch('/withdraw/:id')
+  @Roles(['DELIVERYMAN'])
+  @HttpCode(204)
+  async withdrawOrder(@Param('id') id: string) {
+    const result = await this.orderService.withdrawOrder(id);
+
+    if (result.isLeft()) {
+      const error = result.value;
+
+      switch (error.constructor) {
+        case TheOrderHasAlreadyBeenWithdrawError:
+          throw new ConflictException(error.message);
+        default:
+          throw new BadRequestException(error.message);
+      }
+    }
+
+    // const { order } = result.value;
+
+    // return {
+    //   order,
+    // };
   }
 }

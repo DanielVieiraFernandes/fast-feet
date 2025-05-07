@@ -8,6 +8,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { EntityNotExistsError } from './errors/entity-not-exists-error';
 import { OrderAlreadyExistsOnDatabase } from './errors/order-already-exists-on-database-error';
+import { TheOrderHasAlreadyBeenWithdrawError } from './errors/the-order-has-already-been-withdrawn-error';
 
 @Injectable()
 export class OrderService {
@@ -107,7 +108,6 @@ export class OrderService {
       data: {
         ...(dto.deliverymanId && { deliverymanId: dto.deliverymanId }),
         ...dto,
-        
       },
     });
 
@@ -163,6 +163,40 @@ export class OrderService {
     });
 
     return right({});
+  }
+
+  async withdrawOrder(id: string): Promise<
+    Either<
+      TheOrderHasAlreadyBeenWithdrawError,
+      {
+        order: Order;
+      }
+    >
+  > {
+    const orderOnDatabase = await this.orderOnDatabase(id);
+
+    if (!orderOnDatabase) {
+      return left(new Error('Order not exist'));
+    }
+
+    if (orderOnDatabase.pickedUpAt !== null) {
+      return left(new TheOrderHasAlreadyBeenWithdrawError(id));
+    }
+
+    const pickedUpAt = new Date();
+
+    const order = await this.prisma.order.update({
+      where: {
+        id,
+      },
+      data: {
+        pickedUpAt,
+      },
+    });
+
+    return right({
+      order,
+    });
   }
 
   private async orderOnDatabase(id: string) {

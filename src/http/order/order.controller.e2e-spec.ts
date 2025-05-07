@@ -11,8 +11,10 @@ describe('Create recipient', () => {
   let prisma: PrismaService;
   let jwt: JwtService;
   let user: User;
+  let deliveryMan: User;
   let recipient: Recipient;
   let accessToken: string;
+  let accessTokenDelivery: string;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -40,9 +42,28 @@ describe('Create recipient', () => {
       },
     });
 
+    deliveryMan = await prisma.user.create({
+      data: {
+        cpf: '888.818.888-52',
+        password: '123456',
+        role: 'DELIVERYMAN',
+        city: '',
+        latitude: -22.876945,
+        longitude: -47.250198,
+        state: '',
+        zipcode: '',
+        address: '',
+      },
+    });
+
     accessToken = jwt.sign({
       sub: user.id,
       role: user.role,
+    });
+
+    accessTokenDelivery = jwt.sign({
+      sub: deliveryMan.id,
+      role: deliveryMan.role,
     });
 
     recipient = await prisma.recipient.create({
@@ -223,7 +244,40 @@ describe('Create recipient', () => {
     // console.log(response.error);
 
     expect(response.statusCode).toEqual(200);
-    
-    
+  });
+
+  test('[PATCH] retornar nada /api/orders', async () => {
+    const order = await prisma.order.create({
+      data: {
+        recipientId: recipient.id,
+        details: 'new details',
+        latitude: -22.876945,
+        longitude: -47.250198,
+        state: '',
+        zipcode: '',
+        address: '',
+        city: '',
+      },
+    });
+
+    console.log('pickeupantes ', order);
+
+    const response = await request(app.getHttpServer())
+      .patch(`/api/orders/withdraw/${order.id}`)
+      .set('Authorization', `Bearer ${accessTokenDelivery}`);
+
+    // console.log(response.error);
+
+    expect(response.statusCode).toEqual(204);
+
+    const orderOnDatabase = await prisma.order.findUnique({
+      where: {
+        id: order.id,
+      },
+    });
+
+    // console.log("depoiiiiiiiiis", orderOnDatabase);
+
+    expect(orderOnDatabase?.pickedUpAt).toEqual(expect.any(Date));
   });
 });

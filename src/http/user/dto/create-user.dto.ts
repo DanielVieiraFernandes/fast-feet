@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDecimal, IsEnum, IsNumber, IsString, Length, Matches, MinLength } from 'class-validator';
+import {
+  IsEnum,
+  IsNumber,
+  IsString,
+  Length,
+  Matches,
+  MinLength,
+} from 'class-validator';
 
 enum UserRole {
   DELIVERYMAN = 'DELIVERYMAN',
