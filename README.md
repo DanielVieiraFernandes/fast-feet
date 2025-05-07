@@ -15,7 +15,6 @@ API para controle de encomendas da transportadora fictícia **FastFeet**. A apli
 - **Swagger**: Documentação interativa da API.
 
 ## Padrões de Projeto
-## Padrões de Projeto
 
 - **Arquitetura MVC**: Separação clara entre Model, Controller, e Service.
 - **Programação funcional**: Uso do padrão Either para garantir um fluxo controlado e previsível em falhas da aplicação.
