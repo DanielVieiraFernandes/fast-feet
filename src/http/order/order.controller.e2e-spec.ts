@@ -66,6 +66,8 @@ describe('Create recipient', () => {
       role: deliveryMan.role,
     });
 
+    // criei o recipient com latitude e longitude de Tókio
+
     recipient = await prisma.recipient.create({
       data: {
         name: 'Recipient',
