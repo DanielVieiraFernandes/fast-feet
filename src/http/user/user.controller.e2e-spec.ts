@@ -63,7 +63,7 @@ describe('Create user', () => {
     await app.init();
   });
 
-  test.skip('[POST] /api/users', async () => {
+  test('[POST] /api/users', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/users')
       .set('Authorization', `Bearer ${accessToken}`)
@@ -71,9 +71,16 @@ describe('Create user', () => {
         cpf: '888.888.888-89',
         password: '123456',
         role: 'DELIVERYMAN',
+        details: 'New Details',
+        address: 'Rua Jerônimo da Silva',
+        city: 'Hortolândia',
+        state: 'SP',
+        zipcode: '00000-000',
+        latitude: 35.689487,
+        longitude: 139.691711,
       });
 
-    // console.log(response.error);
+    console.log(response.error);
 
     expect(response.statusCode).toEqual(201);
 
@@ -86,7 +93,7 @@ describe('Create user', () => {
     expect(userOnDatabase).toBeTruthy();
   });
 
-  test.skip('[GET] /api/users', async () => {
+  test('[GET] /api/users', async () => {
     const response = await request(app.getHttpServer())
       .get('/api/users?page=1&size=1')
       .set('Authorization', `Bearer ${accessToken}`);
@@ -96,7 +103,7 @@ describe('Create user', () => {
     console.log(response.body.content.users);
   });
 
-  test.skip('[GET] /api/users/:id', async () => {
+  test('[GET] /api/users/:id', async () => {
     const response = await request(app.getHttpServer())
       .get(`/api/users/${userTest.id}`)
       .set('Authorization', `Bearer ${accessToken}`);
@@ -112,7 +119,7 @@ describe('Create user', () => {
     });
   });
 
-  test.skip('[PUT] /api/users/:id', async () => {
+  test('[PUT] /api/users/:id', async () => {
     console.log('Antes de alterar: ', userTest);
     const response = await request(app.getHttpServer())
       .put(`/api/users/${userTest.id}`)
@@ -135,7 +142,7 @@ describe('Create user', () => {
     expect(userOnDatabase).toBeTruthy();
   });
 
-  test.skip('[DELETE] /api/users/:id', async () => {
+  test('[DELETE] /api/users/:id', async () => {
     const response = await request(app.getHttpServer())
       .delete(`/api/users/${userTest.id}`)
       .set('Authorization', `Bearer ${accessToken}`);

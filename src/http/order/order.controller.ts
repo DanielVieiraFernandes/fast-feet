@@ -71,7 +71,7 @@ export class OrderController {
       throw new BadRequestException();
     }
 
-    console.log(result.value)
+    console.log(result.value);
 
     const { orders } = result.value;
 

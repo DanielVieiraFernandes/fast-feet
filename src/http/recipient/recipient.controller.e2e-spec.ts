@@ -24,7 +24,7 @@ describe('Create recipient', () => {
     await app.init();
   });
 
-  test.skip('[POST] /api/recipients', async () => {
+  test('[POST] /api/recipients', async () => {
     const user = await prisma.user.create({
       data: {
         cpf: '888.888.888-88',
@@ -54,9 +54,11 @@ describe('Create recipient', () => {
         city: 'Hortolândia',
         state: 'SP',
         zipcode: '00000-000',
+        latitude: -22.876945,
+        longitude: -47.250198,
       });
 
-    // console.log(response.error);
+    console.log(response.error);
 
     expect(response.statusCode).toEqual(201);
 

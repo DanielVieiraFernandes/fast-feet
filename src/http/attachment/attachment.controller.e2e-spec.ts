@@ -47,7 +47,7 @@ describe('Controller attachment (E2E)', () => {
     await app.init();
   });
 
-  test.skip('[POST] /api/attachments', async () => {
+  test('[POST] /api/attachments', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/attachment')
       .set('Authorization', `Bearer ${accessToken}`)

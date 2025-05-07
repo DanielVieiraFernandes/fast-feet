@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDecimal, IsEnum, IsString, Length, Matches, MinLength } from 'class-validator';
+import { IsDecimal, IsEnum, IsNumber, IsString, Length, Matches, MinLength } from 'class-validator';
 
 enum UserRole {
   DELIVERYMAN = 'DELIVERYMAN',
@@ -47,9 +47,9 @@ export class CreateUserDto {
   @Matches(/^\d{5}-\d{3}$/, { message: 'O CEP deve ter o formato XXXXX-XXX' })
   zipcode: string;
 
-  @IsDecimal()
+  @IsNumber()
   latitude: number;
 
-  @IsDecimal()
+  @IsNumber()
   longitude: number;
 }

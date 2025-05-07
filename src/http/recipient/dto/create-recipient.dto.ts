@@ -2,6 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDecimal,
   IsEmail,
+  IsLatitude,
+  IsLongitude,
+  IsNumber,
   IsString,
   Matches,
   MinLength,
@@ -37,9 +40,9 @@ export class CreateRecipientDto {
   @Matches(/^\d{5}-\d{3}$/, { message: 'O CEP deve ter o formato XXXXX-XXX' })
   zipcode: string;
 
-  @IsDecimal()
+  @IsLatitude()
   latitude: number;
 
-  @IsDecimal()
+  @IsLongitude()
   longitude: number;
 }
