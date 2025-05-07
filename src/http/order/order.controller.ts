@@ -24,6 +24,9 @@ import { OrderResponseDto } from './dto/order-response.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { EntityNotExistsError } from './errors/entity-not-exists-error';
 import { OrderAlreadyExistsOnDatabase } from './errors/order-already-exists-on-database-error';
+import { OrderCannotBeenMarkedDeliveredError } from './errors/order-cannot-been-marked-delivered-error';
+import { OrderHasAlreadyBeenDeliveredError } from './errors/order-has-already-been-delivered-error';
+import { OrderHasBeenReturnedError } from './errors/order-has-been-returned-error';
 import { TheOrderHasAlreadyBeenWithdrawError } from './errors/the-order-has-already-been-withdrawn-error';
 import { OrderService } from './order.service';
 
@@ -159,11 +162,45 @@ export class OrderController {
           throw new BadRequestException(error.message);
       }
     }
+  }
 
-    // const { order } = result.value;
+  @ApiResponse({ status: 204 })
+  @Patch('/delivered/:id')
+  @Roles(['DELIVERYMAN'])
+  @HttpCode(204)
+  async deliveredOrder(@Param('id') id: string) {
+    const result = await this.orderService.deliveredOrder(id);
 
-    // return {
-    //   order,
-    // };
+    if (result.isLeft()) {
+      const error = result.value;
+
+      switch (error.constructor) {
+        case OrderCannotBeenMarkedDeliveredError:
+          throw new BadRequestException(error.message);
+        case OrderHasAlreadyBeenDeliveredError:
+          throw new BadRequestException(error.message);
+        default:
+          throw new BadRequestException(error.message);
+      }
+    }
+  }
+
+  @ApiResponse({ status: 204 })
+  @Patch('/returned/:id')
+  @Roles(['DELIVERYMAN'])
+  @HttpCode(204)
+  async returnedOrder(@Param('id') id: string) {
+    const result = await this.orderService.returnedOrder(id);
+
+    if (result.isLeft()) {
+      const error = result.value;
+
+      switch (error.constructor) {
+        case OrderHasBeenReturnedError:
+          throw new BadRequestException(error.message);
+        default:
+          throw new BadRequestException(error.message);
+      }
+    }
   }
 }

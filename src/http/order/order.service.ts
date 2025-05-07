@@ -8,6 +8,9 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { EntityNotExistsError } from './errors/entity-not-exists-error';
 import { OrderAlreadyExistsOnDatabase } from './errors/order-already-exists-on-database-error';
+import { OrderCannotBeenMarkedDeliveredError } from './errors/order-cannot-been-marked-delivered-error';
+import { OrderHasAlreadyBeenDeliveredError } from './errors/order-has-already-been-delivered-error';
+import { OrderHasBeenReturnedError } from './errors/order-has-been-returned-error';
 import { TheOrderHasAlreadyBeenWithdrawError } from './errors/the-order-has-already-been-withdrawn-error';
 
 @Injectable()
@@ -197,6 +200,77 @@ export class OrderService {
     return right({
       order,
     });
+  }
+
+  async deliveredOrder(
+    id: string
+  ): Promise<
+    Either<
+      OrderHasAlreadyBeenDeliveredError | OrderCannotBeenMarkedDeliveredError,
+      {}
+    >
+  > {
+    const orderOnDatabase = await this.orderOnDatabase(id);
+
+    if (!orderOnDatabase) {
+      return left(new Error('Order not exist'));
+    }
+
+    if (!orderOnDatabase.pickedUpAt) {
+      return left(new OrderCannotBeenMarkedDeliveredError());
+    }
+
+    if (orderOnDatabase.deliveredAt !== null) {
+      return left(new OrderHasAlreadyBeenDeliveredError());
+    }
+
+    const deliveredAt = new Date();
+
+    await this.prisma.order.update({
+      where: {
+        id,
+      },
+      data: {
+        deliveredAt,
+      },
+    });
+
+    return right({});
+  }
+
+  async returnedOrder(
+    id: string
+  ): Promise<Either<OrderHasBeenReturnedError, {}>> {
+    const orderOnDatabase = await this.orderOnDatabase(id);
+
+    if (!orderOnDatabase) {
+      return left(new Error('Order not exist'));
+    }
+
+    if (!orderOnDatabase.pickedUpAt || !orderOnDatabase.deliveredAt) {
+      return left(
+        new Error(
+          'order cannot be returned as it has not been picked up or delivered'
+        )
+      );
+    }
+
+    if (orderOnDatabase.returnedAt !== null) {
+      return left(new OrderHasBeenReturnedError());
+    }
+
+    const returnedAt = new Date();
+
+    await this.prisma.order.update({
+      where: {
+        id,
+      },
+      data: {
+        returnedAt,
+      },
+    });
+
+    return right({});
   }
 
   private async orderOnDatabase(id: string) {
