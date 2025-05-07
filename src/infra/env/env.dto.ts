@@ -24,4 +24,12 @@ export class EnvDto {
 
   @IsString()
   AWS_SECRET_ACCESS_KEY: string;
+
+
+  @IsString()
+  MAILTRAP_USER: string;
+
+
+  @IsString()
+  MAILTRAP_PASS: string;
 }

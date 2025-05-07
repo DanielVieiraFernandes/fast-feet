@@ -6,8 +6,10 @@ import { AuthModule } from '@/infra/auth/auth.module';
 import { PrismaService } from '@/infra/db/prisma.service';
 import { EnvDto } from '@/infra/env/env.dto';
 import { EnvService } from '@/infra/env/env.service';
+import { EmailModule } from '@/infra/events/email.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
 @Module({
@@ -28,11 +30,13 @@ import { validateSync } from 'class-validator';
         return validateConfig;
       },
     }),
+    EventEmitterModule.forRoot(),
     AuthModule,
     UserModule,
     RecipientModule,
     OrderModule,
     AttachmentModule,
+    EmailModule,
   ],
   providers: [EnvService, PrismaService],
 })

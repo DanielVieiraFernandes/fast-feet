@@ -248,7 +248,7 @@ describe('Create recipient', () => {
     expect(response.statusCode).toEqual(200);
   });
 
-  test('[PATCH] retornar nada /api/orders', async () => {
+  test('[PATCH] retornar nada /api/orders/withdraw', async () => {
     const order = await prisma.order.create({
       data: {
         recipientId: recipient.id,

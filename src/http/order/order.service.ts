@@ -3,6 +3,7 @@ import { Either, left, right } from '@/shared/either';
 import { PaginatedOrdersDto } from '@/utils/dto/paginated-orders.dto';
 import { Paginated } from '@/utils/dto/pagination.dto';
 import { Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Order } from '@prisma/client';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -15,7 +16,10 @@ import { TheOrderHasAlreadyBeenWithdrawError } from './errors/the-order-has-alre
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private eventEmitter: EventEmitter2
+  ) {}
   async findAll(
     dto: PaginatedOrdersDto,
     userId: string
@@ -195,7 +199,12 @@ export class OrderService {
       data: {
         pickedUpAt,
       },
+      include: {
+        recipient: true,
+      },
     });
+
+    this.eventEmitter.emit('order.withdraw', order.recipient.email);
 
     return right({
       order,
@@ -226,14 +235,19 @@ export class OrderService {
 
     const deliveredAt = new Date();
 
-    await this.prisma.order.update({
+    const order = await this.prisma.order.update({
       where: {
         id,
       },
       data: {
         deliveredAt,
       },
+      include: {
+        recipient: true,
+      },
     });
+
+    this.eventEmitter.emit('order.delivered', order.recipient.email);
 
     return right({});
   }
@@ -261,14 +275,19 @@ export class OrderService {
 
     const returnedAt = new Date();
 
-    await this.prisma.order.update({
+    const order = await this.prisma.order.update({
       where: {
         id,
       },
       data: {
         returnedAt,
       },
+      include: {
+        recipient: true,
+      },
     });
+
+    this.eventEmitter.emit('order.returned', order.recipient.email);
 
     return right({});
   }
